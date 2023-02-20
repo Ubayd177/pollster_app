@@ -6,6 +6,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.http import JsonResponse
 
 # questions displayed
 def index(request):
@@ -43,3 +44,14 @@ def vote(request, question_id):
         select.votes += 1
         select.save()
         return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+
+
+def resultsData(request, obj):
+    votedata = []
+
+    question = Question.objects.get(id=obj)
+    votes = question.choice_set.all()
+
+    for i in votes:
+        votedata.append({i.choice_text:i.votes})
+    return JsonResponse(votedata, safe=False)
